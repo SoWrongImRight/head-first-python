@@ -23,10 +23,11 @@ def entry_page() -> 'html':
 
 @app.route('/viewlog')
 def view_the_log() -> str:
+    contents = []
     with open('vsearch.log') as log:
         for line in log:
             contents.append([])
-            for item in line.split(|):
+            for item in line.spli('|'):
                 contents[-1].append(escape(item))
     return str(contents)
 
