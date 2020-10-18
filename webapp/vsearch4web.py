@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, escape
+from flask import Flask, render_template, request, escape, session
 from vsearch import search4letters
 from DBcm import UseDatabase
+from checker import check_logged_in
 
 app = Flask(__name__)
+
+app.secret_key = 'YouWillNeverGuess'
 
 app.config['dbconfig'] = { 'host': '127.0.0.1',
                            'user': 'vsearch',
@@ -29,7 +32,25 @@ def do_search() -> str:
 def entry_page() -> 'html':
     return render_template('entry.html', the_title='Welcome to search4letters on the web!')
 
+@app.route('/login')
+def do_login() -> str:
+    session['logged_in'] = True
+    return 'You are now logged in.'
+
+@app.route('/logout')
+def do_logout() -> str:
+    session.pop('logged_in')
+    return 'You are logged out.'
+
+@app.route('/status')
+def check_status() -> str:
+    if 'logged_in' in session:
+        return 'You are currently logged in.'
+    return 'You are not currently logged in.'
+
+
 @app.route('/viewlog')
+@check_logged_in
 def view_the_log() -> 'html':
     """Display the contents of the log files as an HTML table"""
     contents = []
